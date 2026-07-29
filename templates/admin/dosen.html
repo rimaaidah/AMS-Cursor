@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% set title = "Dosen" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">{% if edit %}Edit dosen{% else %}Pilih dosen untuk edit{% endif %}</div>
+          <div class="card__subtitle">CRUD data dosen (admin).</div>
+        </div>
+        <div class="actions">
+          <a class="btn btn--primary" href="{{ url_for('admin_create_dosen') }}">+ Buat Dosen</a>
+          {% if edit %}
+            <a class="btn" href="{{ url_for('admin_dosen') }}">Batal</a>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if edit and edit_user %}
+        <form method="post" class="form">
+          <input type="hidden" name="action" value="update" />
+          <input type="hidden" name="dosen_id" value="{{ edit.id }}" />
+          <label class="field">
+            <span class="field__label">Nama</span>
+            <input class="input" name="nama" value="{{ edit.nama }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">NIDN</span>
+            <input class="input" name="nidn" value="{{ edit.nidn }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">Prodi</span>
+            <input class="input" name="prodi" value="{{ edit.prodi }}" />
+          </label>
+          <div class="divider"></div>
+          <label class="field">
+            <span class="field__label">Username</span>
+            <input class="input" name="username" value="{{ edit_user.username }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">Reset password (opsional)</span>
+            <input class="input" name="password" placeholder="Kosongkan jika tidak diubah" />
+          </label>
+          <div class="actions">
+            <button class="btn btn--primary" type="submit">Simpan</button>
+          </div>
+        </form>
+        <div class="form" style="padding-top:0">
+          <form method="post" action="{{ url_for('admin_dosen_delete', dosen_id=edit.id) }}" class="inline">
+            <button class="btn" type="submit" onclick="return confirm('Hapus dosen ini?')">Hapus dosen</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="empty">Klik tombol <strong>Edit</strong> di tabel untuk mengubah data.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar dosen</div>
+          <div class="card__subtitle">{{ dosen|length }} data</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama</th>
+              <th>NIDN</th>
+              <th>Prodi</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in dosen %}
+              <tr>
+                <td class="muted">{{ d.id }}</td>
+                <td><strong>{{ d.nama }}</strong></td>
+                <td class="muted">{{ d.nidn }}</td>
+                <td class="muted">{{ d.prodi }}</td>
+                <td>
+                  <a class="btn btn--small" href="{{ url_for('admin_dosen', edit=d.id) }}">Edit</a>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5" class="muted">Belum ada dosen.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
