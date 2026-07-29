@@ -1,0 +1,322 @@
+{
+  "meta": {
+    "version": 1,
+    "created_at": 0
+  },
+  "settings": {
+    "active_year": "2025/2026",
+    "active_term": "ganjil",
+    "krs_open": true,
+    "kuliah_open": true,
+    "nilai_open": true
+  },
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password_hash": "scrypt:32768:8:1$6updMR4EPmr8tlq2$8222d145b06d78cb07d2e13ad45d3d14ce0a0dc958d1a052c4381d99836075e7813cffc93c317b55e1ca508cf4c26d5da1821edc6c0ef06503d7e3e3ebc9b339",
+      "role": "admin",
+      "ref": {
+        "type": "admin",
+        "id": 1
+      },
+      "created_at": 1769418431,
+      "updated_at": 1769418431
+    },
+    {
+      "id": 2,
+      "username": "dosen1",
+      "password_hash": "scrypt:32768:8:1$wiNCpnyclPSfFCBB$ae4f5a85aff72172b5ad0393039bb7e526fab28090f6c0c1f18566377eb9016e5f42f34c035f8f2d0af98c8160da0053753ab3853aae11766f950c5f166c6a45",
+      "role": "dosen",
+      "ref": {
+        "type": "dosen",
+        "id": 1
+      },
+      "created_at": 1769419109,
+      "updated_at": 1769419109
+    },
+    {
+      "id": 3,
+      "username": "mhs1",
+      "password_hash": "scrypt:32768:8:1$EpNikmEUGEX1M9Z3$737620d5039469a33e578294bd699b09fe5b4329c496b6e34c38962e40ba0131c693f988c016142b51bff465d6e129109daac7ed8378afd9bd76f0362e7a7495",
+      "role": "mahasiswa",
+      "ref": {
+        "type": "mahasiswa",
+        "id": 1
+      },
+      "created_at": 1769419109,
+      "updated_at": 1784469455
+    }
+  ],
+  "jurusan": [
+    {
+      "id": 1,
+      "kode": "BCA",
+      "nama": "Bachelor of Computer Applications"
+    },
+    {
+      "id": 2,
+      "kode": "IF",
+      "nama": "Informatics Engineering"
+    }
+  ],
+  "dosen": [
+    {
+      "id": 1,
+      "nama": "Dosen Demo",
+      "nidn": "D-0001",
+      "prodi": "BCA"
+    }
+  ],
+  "mahasiswa": [
+    {
+      "id": 1,
+      "nama": "Rima Aidah",
+      "nim": "301230035",
+      "jurusan_id": 1,
+      "semester": 6,
+      "dosen_wali_id": 1
+    }
+  ],
+  "matakuliah": [
+    {
+      "id": 1,
+      "kode": "STAT101",
+      "nama": "Statistical Methods",
+      "sks": 3,
+      "jurusan_id": 1,
+      "semester_rekom": 3,
+      "term": "ganjil"
+    },
+    {
+      "id": 2,
+      "kode": "SE201",
+      "nama": "Software Engineering",
+      "sks": 3,
+      "jurusan_id": 1,
+      "semester_rekom": 3,
+      "term": "ganjil"
+    },
+    {
+      "id": 3,
+      "kode": "PKN101",
+      "nama": "Pendidikan Kewarganegaraan",
+      "sks": 2,
+      "jurusan_id": 1,
+      "semester_rekom": 3,
+      "term": "genap"
+    }
+  ],
+  "offering": [
+    {
+      "id": 1,
+      "matakuliah_id": 1,
+      "dosen_id": 1,
+      "year": "2025/2026",
+      "term": "ganjil",
+      "created_at": 1769419109
+    },
+    {
+      "id": 2,
+      "matakuliah_id": 2,
+      "dosen_id": 1,
+      "year": "2025/2026",
+      "term": "ganjil",
+      "created_at": 1769419109
+    },
+    {
+      "id": 3,
+      "matakuliah_id": 3,
+      "dosen_id": 1,
+      "year": "2024/2025",
+      "term": "genap",
+      "created_at": 1769419109
+    },
+    {
+      "id": 4,
+      "matakuliah_id": 2,
+      "dosen_id": 1,
+      "year": "2025/2026",
+      "term": "ganjil",
+      "created_at": 1769420131
+    }
+  ],
+  "krs": [
+    {
+      "id": 1,
+      "mahasiswa_id": 1,
+      "year": "2025/2026",
+      "term": "ganjil",
+      "items": [
+        1,
+        2,
+        4
+      ],
+      "status": "approved",
+      "created_at": 1769419109,
+      "updated_at": 1769423362,
+      "approved_by": 2,
+      "approved_at": 1769423446
+    }
+  ],
+  "enrollments": [
+    {
+      "id": 1,
+      "offering_id": 3,
+      "mahasiswa_id": 1,
+      "attendance": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "grade": {
+        "numeric": 86,
+        "letter": "A"
+      },
+      "created_at": 1769419109,
+      "updated_at": 1769419109,
+      "updated_by": 1
+    },
+    {
+      "id": 2,
+      "offering_id": 1,
+      "mahasiswa_id": 1,
+      "attendance": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        true,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nilai_tugas_mandiri": 80,
+      "nilai_tugas_terstruktur": 90,
+      "nilai_uts": 80,
+      "nilai_uas": 70,
+      "komposisi": {
+        "tugas_mandiri": 10,
+        "tugas_terstruktur": 20,
+        "uts": 30,
+        "uas": 40
+      },
+      "grade": {
+        "numeric": 78.0,
+        "letter": "B"
+      },
+      "created_at": 1769423446,
+      "updated_at": 1784469694,
+      "updated_by": 2
+    },
+    {
+      "id": 3,
+      "offering_id": 2,
+      "mahasiswa_id": 1,
+      "attendance": [
+        true,
+        null,
+        null,
+        true,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nilai_tugas_mandiri": null,
+      "nilai_tugas_terstruktur": null,
+      "nilai_uts": null,
+      "nilai_uas": null,
+      "komposisi": {
+        "tugas_mandiri": 10,
+        "tugas_terstruktur": 20,
+        "uts": 30,
+        "uas": 40
+      },
+      "grade": {
+        "numeric": null,
+        "letter": null
+      },
+      "created_at": 1769423446,
+      "updated_at": 1784469772,
+      "updated_by": 2
+    },
+    {
+      "id": 4,
+      "offering_id": 4,
+      "mahasiswa_id": 1,
+      "attendance": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nilai_tugas_mandiri": null,
+      "nilai_tugas_terstruktur": null,
+      "nilai_uts": null,
+      "nilai_uas": null,
+      "komposisi": {
+        "tugas_mandiri": 10,
+        "tugas_terstruktur": 20,
+        "uts": 30,
+        "uas": 40
+      },
+      "grade": {
+        "numeric": null,
+        "letter": null
+      },
+      "created_at": 1769423446,
+      "updated_at": 1769423446,
+      "updated_by": 2
+    }
+  ],
+  "bimbingan": [
+    {
+      "id": 1,
+      "dosen_id": 1,
+      "mahasiswa_id": 1,
+      "created_at": 1784469455
+    }
+  ]
+}
