@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% set title = "Buat Akun Mahasiswa" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Form mahasiswa</div>
+          <div class="card__subtitle">Akun otomatis dibuat saat submit.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <label class="field">
+          <span class="field__label">Nama</span>
+          <input class="input" name="nama" required />
+        </label>
+        <label class="field">
+          <span class="field__label">NIM</span>
+          <input class="input" name="nim" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Jurusan</span>
+          <select class="input" name="jurusan_id" required>
+            <option value="">Pilih jurusan</option>
+            {% for j in jurusan %}
+              <option value="{{ j.id }}">{{ j.kode }} — {{ j.nama }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Semester</span>
+          <input class="input" type="number" name="semester" min="1" max="14" value="3" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Dosen wali (opsional)</span>
+          <select class="input" name="dosen_wali_id">
+            <option value="">-</option>
+            {% for d in dosen %}
+              <option value="{{ d.id }}">{{ d.nama }} ({{ d.nidn }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="divider"></div>
+        <label class="field">
+          <span class="field__label">Username</span>
+          <input class="input" name="username" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Password awal</span>
+          <input class="input" name="password" placeholder="Default: mhs123" />
+        </label>
+        <button class="btn btn--primary" type="submit">Buat akun</button>
+      </form>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Alur KRS</div>
+          <div class="card__subtitle">Ringkas.</div>
+        </div>
+      </div>
+      <ol class="list">
+        <li>Admin atur <strong>active year/term</strong> + buka periode KRS.</li>
+        <li>Mahasiswa pilih mata kuliah (terfilter jurusan & term).</li>
+        <li>Dosen wali menyetujui KRS.</li>
+        <li>Mahasiswa otomatis masuk ke daftar kelas dosen pengampu (enrollments).</li>
+      </ol>
+    </div>
+  </div>
+{% endblock %}
+
