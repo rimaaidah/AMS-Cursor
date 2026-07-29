@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% set title = "Mahasiswa" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">{% if edit %}Edit mahasiswa{% else %}Pilih mahasiswa untuk edit{% endif %}</div>
+          <div class="card__subtitle">CRUD data mahasiswa (admin).</div>
+        </div>
+        <div class="actions">
+          <a class="btn btn--primary" href="{{ url_for('admin_create_mahasiswa') }}">+ Buat Mahasiswa</a>
+          {% if edit %}
+            <a class="btn" href="{{ url_for('admin_mahasiswa') }}">Batal</a>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if edit and edit_user %}
+        <form method="post" class="form">
+          <input type="hidden" name="mahasiswa_id" value="{{ edit.id }}" />
+          <label class="field">
+            <span class="field__label">Nama</span>
+            <input class="input" name="nama" value="{{ edit.nama }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">NIM</span>
+            <input class="input" name="nim" value="{{ edit.nim }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">Jurusan</span>
+            <select class="input" name="jurusan_id" required>
+              {% for j in jurusan %}
+                <option value="{{ j.id }}" {% if edit.jurusan_id==j.id %}selected{% endif %}>{{ j.kode }} — {{ j.nama }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <div class="grid grid--2">
+            <label class="field">
+              <span class="field__label">Semester</span>
+              <input class="input" type="number" name="semester" min="1" max="14" value="{{ edit.semester }}" required />
+            </label>
+            <label class="field">
+              <span class="field__label">Dosen wali</span>
+              <select class="input" name="dosen_wali_id">
+                <option value="">-</option>
+                {% for d in dosen %}
+                  <option value="{{ d.id }}" {% if edit.dosen_wali_id==d.id %}selected{% endif %}>{{ d.nama }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
+          <div class="divider"></div>
+          <label class="field">
+            <span class="field__label">Username</span>
+            <input class="input" name="username" value="{{ edit_user.username }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">Reset password (opsional)</span>
+            <input class="input" name="password" placeholder="Kosongkan jika tidak diubah" />
+          </label>
+          <div class="actions">
+            <button class="btn btn--primary" type="submit">Simpan</button>
+          </div>
+        </form>
+        <div class="form" style="padding-top:0">
+          <form method="post" action="{{ url_for('admin_mahasiswa_delete', mahasiswa_id=edit.id) }}" class="inline">
+            <button class="btn" type="submit" onclick="return confirm('Hapus mahasiswa ini?')">Hapus mahasiswa</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="empty">Klik tombol <strong>Edit</strong> di tabel untuk mengubah data.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar mahasiswa</div>
+          <div class="card__subtitle">{{ mahasiswa|length }} data</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama</th>
+              <th>NIM</th>
+              <th>Jurusan</th>
+              <th>Sem</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in mahasiswa %}
+              <tr>
+                <td class="muted">{{ m.id }}</td>
+                <td><strong>{{ m.nama }}</strong></td>
+                <td class="muted">{{ m.nim }}</td>
+                <td class="muted">{{ m.jurusan_id }}</td>
+                <td class="muted">{{ m.semester }}</td>
+                <td><a class="btn btn--small" href="{{ url_for('admin_mahasiswa', edit=m.id) }}">Edit</a></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="6" class="muted">Belum ada mahasiswa.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
