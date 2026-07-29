@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% set title = "Offering Detail" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">{{ mk.kode if mk else "MK" }} — {{ mk.nama if mk else "" }}</div>
+          <div class="card__subtitle">Offering #{{ offering.id }} • {{ offering.year }}/{{ offering.term }}</div>
+        </div>
+      </div>
+
+      <form method="post" class="form">
+        <input type="hidden" name="action" value="add_student" />
+        <label class="field">
+          <span class="field__label">Tambah mahasiswa ke kelas</span>
+          <select class="input" name="mahasiswa_id" required>
+            <option value="">Pilih mahasiswa</option>
+            {% for m in mahasiswa %}
+              <option value="{{ m.id }}">{{ m.nama }} — {{ m.nim }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="btn btn--primary" type="submit">Tambahkan</button>
+        <div class="hint">Ini berguna untuk demo/testing, atau jika admin perlu override data.</div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Input nilai (admin)</div>
+          <div class="card__subtitle">Admin bisa input nilai siapa pun.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <input type="hidden" name="action" value="save_grades" />
+        <div class="table-wrap">
+          <table class="table table--dense">
+            <thead>
+              <tr>
+                <th>Mahasiswa</th>
+                <th>Nilai</th>
+                <th>Presensi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in enrollments %}
+                {% set m = mahasiswa_by_id.get(e.mahasiswa_id) %}
+                {% set att = e.attendance or [] %}
+                {% set hadir = (att|select('equalto', true)|list|length) %}
+                {% set g = e.grade or {} %}
+                <tr>
+                  <td><strong>{{ m.nama if m else e.mahasiswa_id }}</strong><div class="muted">{{ m.nim if m else "" }}</div></td>
+                  <td>
+                    <input class="input input--small" type="number" min="0" max="100"
+                      name="numeric_{{ e.mahasiswa_id }}" value="{{ g.numeric if g.numeric is not none else '' }}" />
+                  </td>
+                  <td class="muted">{{ hadir }}/16</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="3" class="muted">Belum ada enrollments.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn--primary" type="submit">Simpan nilai</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
