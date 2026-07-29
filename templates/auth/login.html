@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login • AMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  </head>
+  <body class="auth-body">
+    <div class="auth-card">
+      <div class="auth-card__brand">
+        <div class="brand__logo">AMS</div>
+        <div>
+          <div class="auth-card__title">Academic Management System</div>
+          <div class="auth-card__subtitle">Masuk untuk melanjutkan</div>
+        </div>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="toasts">
+            {% for category, message in messages %}
+              <div class="toast toast--{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" class="form">
+        <h2 style="text-align:center; margin:0 0 20px 0; font-weight:800; font-size:24px">Login</h2>
+        <label class="field">
+          <span class="field__label">Username</span>
+          <input class="input" name="username" autocomplete="username" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Password</span>
+          <input class="input" type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn btn--primary" type="submit">Login</button>
+      </form>
+    </div>
+  </body>
+</html>
+

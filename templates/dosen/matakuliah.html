@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% set title = "Mata Kuliah Diampu" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Offering saya</div>
+        <div class="card__subtitle">Klik detail untuk presensi & nilai.</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Offering</th>
+            <th>Mata kuliah / Kelas</th>
+            <th>Year/Term</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in offerings %}
+            {% set mk = mk_by_id.get(o.matakuliah_id) %}
+            <tr>
+              <td><strong>#{{ o.id }}</strong></td>
+              <td>
+                <div><strong>{{ mk.kode if mk else o.matakuliah_id }}</strong> — {{ mk.nama if mk else "" }}</div>
+                <div class="muted">Kelas: {{ o.kelas or '-' }}</div>
+              </td>
+              <td class="muted">{{ o.year }} / {{ o.term }}</td>
+              <td><a class="btn btn--small" href="{{ url_for('dosen_mk_detail', offering_id=o.id) }}">Detail</a></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="4" class="muted">Belum ada offering.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

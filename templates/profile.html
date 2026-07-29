@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% set title = "Profil" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Akun</div>
+          <div class="card__subtitle">Ubah username dan/atau password.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <label class="field">
+          <span class="field__label">Role</span>
+          <input class="input" value="{{ me.role }}" disabled />
+        </label>
+        <label class="field">
+          <span class="field__label">Username</span>
+          <input class="input" name="username" value="{{ me.username }}" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Password baru (opsional)</span>
+          <input class="input" type="password" name="password" placeholder="Kosongkan jika tidak ganti" />
+        </label>
+        <button class="btn btn--primary" type="submit">Simpan</button>
+      </form>
+      <div class="hint">
+        Perubahan profil akan langsung terlihat di menu Admin &rarr; Users.
+      </div>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Keamanan</div>
+          <div class="card__subtitle">Tips cepat.</div>
+        </div>
+      </div>
+      <ul class="list">
+        <li><strong>Ganti password default</strong> setelah akun dibuat.</li>
+        <li>Hindari password pendek dan mudah ditebak.</li>
+        <li>Jangan bagikan akun ke orang lain.</li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}
+

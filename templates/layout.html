@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ title or "AMS" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand__logo">AMS</div>
+          <div class="brand__meta">
+            <div class="brand__name">Academic System</div>
+            <div class="brand__sub">Modern • Elegant • Luxury</div>
+          </div>
+        </div>
+
+        {% if me %}
+          <nav class="nav">
+            {% if me.role == "admin" %}
+              <a class="nav__item" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+              <a class="nav__item" href="{{ url_for('admin_users') }}">Users</a>
+              <a class="nav__item" href="{{ url_for('admin_dosen') }}">Dosen</a>
+              <a class="nav__item" href="{{ url_for('admin_mahasiswa') }}">Mahasiswa</a>
+              <a class="nav__item" href="{{ url_for('admin_jurusan') }}">Jurusan</a>
+              <a class="nav__item" href="{{ url_for('admin_matakuliah') }}">Mata Kuliah</a>
+              <a class="nav__item" href="{{ url_for('admin_offering') }}">Offering</a>
+              <a class="nav__item" href="{{ url_for('admin_bimbingan') }}">Bimbingan</a>
+              <a class="nav__item" href="{{ url_for('admin_settings') }}">Settings</a>
+            {% elif me.role == "dosen" %}
+              <a class="nav__item" href="{{ url_for('dosen_dashboard') }}">Dashboard</a>
+              <a class="nav__item" href="{{ url_for('dosen_matakuliah') }}">Mata Kuliah</a>
+              <a class="nav__item" href="{{ url_for('dosen_bimbingan') }}">Bimbingan & KRS</a>
+            {% elif me.role == "mahasiswa" %}
+              <a class="nav__item" href="{{ url_for('mahasiswa_dashboard') }}">Dashboard</a>
+              <a class="nav__item" href="{{ url_for('mahasiswa_krs') }}">KRS</a>
+              <a class="nav__item" href="{{ url_for('mahasiswa_nilai') }}">Nilai</a>
+            {% endif %}
+          </nav>
+
+          <div class="sidebar__footer">
+            <a class="nav__item" href="{{ url_for('profile') }}">Profil</a>
+            <a class="nav__item nav__item--muted" href="{{ url_for('logout') }}">Logout</a>
+          </div>
+        {% endif %}
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar__left">
+            <div class="page-title">{{ title or "Dashboard" }}</div>
+            <div class="badge">
+              Tahun ajaran: <strong>{{ settings.active_year }}</strong>
+              &nbsp;•&nbsp; Term: <strong>{{ settings.active_term }}</strong>
+              &nbsp;•&nbsp; KRS: <strong>{{ "Buka" if settings.krs_open else "Tutup" }}</strong>
+              &nbsp;•&nbsp; Kuliah: <strong>{{ "Buka" if settings.kuliah_open else "Tutup" }}</strong>
+              &nbsp;•&nbsp; Input Nilai: <strong>{{ "Buka" if settings.nilai_open else "Tutup" }}</strong>
+            </div>
+          </div>
+          <div class="topbar__right">
+            {% if me %}
+              <div class="user-pill">
+                <div class="user-pill__avatar">{{ me.username[:1]|upper }}</div>
+                <div class="user-pill__meta">
+                  <div class="user-pill__name">{{ me.username }}</div>
+                  <div class="user-pill__role">{{ me.role|capitalize }}</div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </header>
+
+        <section class="content">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="toasts">
+                {% for category, message in messages %}
+                  <div class="toast toast--{{ category }}">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          {% block content %}{% endblock %}
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
+

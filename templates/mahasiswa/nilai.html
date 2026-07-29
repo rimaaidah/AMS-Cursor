@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% set title = "Nilai" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Nilai mata kuliah</div>
+        <div class="card__subtitle">Tampil real-time dari input dosen/admin.</div>
+      </div>
+      <div class="badge">
+        Periode aktif: <strong>{{ settings.active_year }}</strong> • <strong>{{ settings.active_term }}</strong>
+        {% if settings.kuliah_open %} • <strong>Kuliah</strong>{% endif %}
+        {% if settings.nilai_open %} • <strong>Input Nilai</strong>{% endif %}
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Year/Term</th>
+            <th>Kode</th>
+            <th>Mata Kuliah</th>
+            <th>SKS</th>
+            <th>Dosen</th>
+            <th>Presensi</th>
+            {% if settings.kuliah_open %}
+              <th>Tugas Mandiri</th>
+              <th>Tugas Terstruktur</th>
+            {% endif %}
+            {% if settings.nilai_open %}
+              <th>UTS</th>
+              <th>UAS</th>
+            {% endif %}
+            <th>Nilai Akhir</th>
+            <th>Huruf</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td class="muted">{{ r.year }} / {{ r.term }}</td>
+              <td><strong>{{ r.kode }}</strong></td>
+              <td>{{ r.nama }}</td>
+              <td class="muted">{{ r.sks }}</td>
+              <td class="muted">{{ r.dosen }}</td>
+              <td class="muted">{{ r.hadir }}</td>
+              {% if settings.kuliah_open %}
+                <td class="muted">{{ r.nilai_tugas_mandiri if r.nilai_tugas_mandiri is not none else "-" }}</td>
+                <td class="muted">{{ r.nilai_tugas_terstruktur if r.nilai_tugas_terstruktur is not none else "-" }}</td>
+              {% endif %}
+              {% if settings.nilai_open %}
+                <td class="muted">{{ r.nilai_uts if r.nilai_uts is not none else "-" }}</td>
+                <td class="muted">{{ r.nilai_uas if r.nilai_uas is not none else "-" }}</td>
+              {% endif %}
+              <td><strong>{{ r.nilai if r.nilai is not none else "-" }}</strong></td>
+              <td><span class="pill">{{ r.huruf if r.huruf else "-" }}</span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="{% if settings.kuliah_open and settings.nilai_open %}12{% elif settings.kuliah_open or settings.nilai_open %}10{% else %}8{% endif %}" class="muted">Belum ada data enrollments (KRS belum disetujui atau nilai belum diinput).</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if settings.nilai_open %}
+    {% for r in rows %}
+      {% if r.nilai is not none %}
+        <div class="card" style="margin-top:16px">
+          <div class="card__header">
+            <div>
+              <div class="card__title">{{ r.kode }} — {{ r.nama }}</div>
+              <div class="card__subtitle">Detail nilai & rekapan kehadiran.</div>
+            </div>
+          </div>
+          <div class="grid grid--2">
+            <div class="kv">
+              <div class="kv__row"><div class="kv__k">Tugas Mandiri</div><div class="kv__v">{{ r.nilai_tugas_mandiri if r.nilai_tugas_mandiri is not none else "-" }} ({{ r.komposisi.tugas_mandiri }}%)</div></div>
+              <div class="kv__row"><div class="kv__k">Tugas Terstruktur</div><div class="kv__v">{{ r.nilai_tugas_terstruktur if r.nilai_tugas_terstruktur is not none else "-" }} ({{ r.komposisi.tugas_terstruktur }}%)</div></div>
+              <div class="kv__row"><div class="kv__k">UTS</div><div class="kv__v">{{ r.nilai_uts if r.nilai_uts is not none else "-" }} ({{ r.komposisi.uts }}%)</div></div>
+              <div class="kv__row"><div class="kv__k">UAS</div><div class="kv__v">{{ r.nilai_uas if r.nilai_uas is not none else "-" }} ({{ r.komposisi.uas }}%)</div></div>
+              <div class="kv__row"><div class="kv__k">Nilai Akhir</div><div class="kv__v"><strong>{{ r.nilai }}</strong> ({{ r.huruf }})</div></div>
+            </div>
+            <div>
+              <div class="card__title" style="padding:0 16px 8px">Rekapan Kehadiran</div>
+              <div class="table-wrap">
+                <table class="table table--dense">
+                  <thead>
+                    <tr>
+                      <th>Pertemuan</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in range(1, 17) %}
+                      {% set att_i = r.attendance[i-1] if r.attendance|length >= i else none %}
+                      <tr>
+                        <td class="muted">Pertemuan {{ i }}</td>
+                        <td>
+                          {% if att_i is sameas true %}
+                            <span class="pill pill--ok">Hadir</span>
+                          {% elif att_i is sameas false %}
+                            <span class="pill pill--warn">Tidak Hadir</span>
+                          {% else %}
+                            <span class="muted">-</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+

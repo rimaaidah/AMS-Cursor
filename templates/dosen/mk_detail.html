@@ -1,0 +1,204 @@
+{% extends "layout.html" %}
+{% set title = "Detail Mata Kuliah" %}
+{% block content %}
+  <div class="grid grid--2">
+    {% if settings.kuliah_open %}
+      <div class="card">
+        <div class="card__header">
+          <div>
+            <div class="card__title">Presensi (Periode Kuliah)</div>
+            <div class="card__subtitle">Offering #{{ offering.id }} • {{ offering.year }}/{{ offering.term }}</div>
+          </div>
+          <div class="actions">
+            <a class="btn btn--small" href="{{ url_for('dosen_mk_rekap', offering_id=offering.id) }}">Rekap kehadiran</a>
+          </div>
+        </div>
+
+        <form method="post" class="form">
+          <input type="hidden" name="action" value="save_attendance" />
+          <label class="field">
+            <span class="field__label">Pertemuan</span>
+            <select class="input" name="meeting" id="meetingSelect">
+              {% for i in range(1, 17) %}
+                <option value="{{ i }}" {% if i == selected_meeting %}selected{% endif %}>Pertemuan {{ i }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <div class="hint">Centang mahasiswa yang <strong>hadir</strong> pada pertemuan terpilih.</div>
+          <div class="table-wrap">
+            <table class="table table--dense">
+              <thead>
+                <tr>
+                  <th>Hadir</th>
+                  <th>Mahasiswa</th>
+                  <th>NIM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in enrollments %}
+                  {% set m = mahasiswa_by_id.get(e.mahasiswa_id) %}
+                  {% set att = e.attendance or [] %}
+                  {% set cur = (att[selected_meeting-1] if att|length >= selected_meeting else none) %}
+                  <tr>
+                    <td>
+                      <input type="checkbox" name="present" value="{{ e.mahasiswa_id }}" {% if cur is sameas true %}checked{% endif %} />
+                    </td>
+                    <td><strong>{{ m.nama if m else e.mahasiswa_id }}</strong></td>
+                    <td class="muted">{{ m.nim if m else "-" }}</td>
+                  </tr>
+                {% else %}
+                  <tr><td colspan="3" class="muted">Belum ada mahasiswa (KRS belum disetujui).</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <button class="btn btn--primary" type="submit">Simpan presensi</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div>
+            <div class="card__title">Nilai Tugas (Periode Kuliah)</div>
+            <div class="card__subtitle">Input nilai tugas mandiri & terstruktur.</div>
+          </div>
+        </div>
+        <form method="post" class="form">
+          <input type="hidden" name="action" value="save_tugas" />
+          <div class="table-wrap">
+            <table class="table table--dense">
+              <thead>
+                <tr>
+                  <th>Mahasiswa</th>
+                  <th>Tugas Mandiri</th>
+                  <th>Tugas Terstruktur</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in enrollments %}
+                  {% set m = mahasiswa_by_id.get(e.mahasiswa_id) %}
+                  <tr>
+                    <td><strong>{{ m.nama if m else e.mahasiswa_id }}</strong></td>
+                    <td>
+                      <input class="input input--small" type="number" min="0" max="100"
+                        name="tugas_mandiri_{{ e.mahasiswa_id }}" value="{{ e.nilai_tugas_mandiri if e.nilai_tugas_mandiri is not none else '' }}" />
+                    </td>
+                    <td>
+                      <input class="input input--small" type="number" min="0" max="100"
+                        name="tugas_terstruktur_{{ e.mahasiswa_id }}" value="{{ e.nilai_tugas_terstruktur if e.nilai_tugas_terstruktur is not none else '' }}" />
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr><td colspan="3" class="muted">Belum ada mahasiswa.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <button class="btn btn--primary" type="submit">Simpan nilai tugas</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="card card--soft">
+        <div class="card__header">
+          <div>
+            <div class="card__title">Periode Kuliah</div>
+            <div class="card__subtitle">Belum dibuka oleh admin.</div>
+          </div>
+        </div>
+        <div class="empty">Tunggu admin membuka periode kuliah untuk input presensi & nilai tugas.</div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if settings.nilai_open %}
+    <div class="card" style="margin-top:16px">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Input Nilai UTS/UAS (Periode Input Nilai)</div>
+          <div class="card__subtitle">Input UTS/UAS dan komposisi, nilai akhir otomatis dihitung.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <input type="hidden" name="action" value="save_uts_uas" />
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mahasiswa</th>
+                <th>Tugas Mandiri</th>
+                <th>Tugas Terstruktur</th>
+                <th>UTS</th>
+                <th>UAS</th>
+                <th>Komposisi (%)</th>
+                <th>Nilai Akhir</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in enrollments %}
+                {% set m = mahasiswa_by_id.get(e.mahasiswa_id) %}
+                {% set komp = e.komposisi or {"tugas_mandiri": 10, "tugas_terstruktur": 20, "uts": 30, "uas": 40} %}
+                {% set g = e.grade or {} %}
+                <tr>
+                  <td><strong>{{ m.nama if m else e.mahasiswa_id }}</strong></td>
+                  <td class="muted">{{ e.nilai_tugas_mandiri if e.nilai_tugas_mandiri is not none else "-" }}</td>
+                  <td class="muted">{{ e.nilai_tugas_terstruktur if e.nilai_tugas_terstruktur is not none else "-" }}</td>
+                  <td>
+                    <input class="input input--small" type="number" min="0" max="100"
+                      name="uts_{{ e.mahasiswa_id }}" value="{{ e.nilai_uts if e.nilai_uts is not none else '' }}" />
+                  </td>
+                  <td>
+                    <input class="input input--small" type="number" min="0" max="100"
+                      name="uas_{{ e.mahasiswa_id }}" value="{{ e.nilai_uas if e.nilai_uas is not none else '' }}" />
+                  </td>
+                  <td>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:4px">
+                      <input class="input input--small" type="number" min="0" max="100" placeholder="TM"
+                        name="komp_tm_{{ e.mahasiswa_id }}" value="{{ komp.tugas_mandiri }}" />
+                      <input class="input input--small" type="number" min="0" max="100" placeholder="TT"
+                        name="komp_tt_{{ e.mahasiswa_id }}" value="{{ komp.tugas_terstruktur }}" />
+                      <input class="input input--small" type="number" min="0" max="100" placeholder="UTS"
+                        name="komp_uts_{{ e.mahasiswa_id }}" value="{{ komp.uts }}" />
+                      <input class="input input--small" type="number" min="0" max="100" placeholder="UAS"
+                        name="komp_uas_{{ e.mahasiswa_id }}" value="{{ komp.uas }}" />
+                    </div>
+                  </td>
+                  <td>
+                    <strong>{{ g.numeric if g.numeric is not none else "-" }}</strong>
+                    <div class="muted">{{ g.letter if g.letter else "" }}</div>
+                  </td>
+                </tr>
+              {% else %}
+                <tr><td colspan="7" class="muted">Belum ada mahasiswa.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn--primary" type="submit">Simpan UTS/UAS & Hitung Nilai Akhir</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="card card--soft" style="margin-top:16px">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Periode Input Nilai</div>
+          <div class="card__subtitle">Belum dibuka oleh admin.</div>
+        </div>
+      </div>
+      <div class="empty">Tunggu admin membuka periode input nilai untuk input UTS/UAS.</div>
+    </div>
+  {% endif %}
+  <script>
+    (() => {
+      const sel = document.getElementById('meetingSelect');
+      if (!sel) return;
+      sel.addEventListener('change', () => {
+        const m = sel.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('meeting', m);
+        window.location.href = url.toString();
+      });
+    })();
+  </script>
+{% endblock %}
+

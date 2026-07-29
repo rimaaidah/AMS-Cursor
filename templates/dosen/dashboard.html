@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% set title = "Dosen Dashboard" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Kelas yang kamu ampu</div>
+        <div class="card__subtitle">Presensi 16 pertemuan & input nilai real-time.</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn--primary" href="{{ url_for('dosen_matakuliah') }}">Kelola Mata Kuliah</a>
+        <a class="btn" href="{{ url_for('dosen_bimbingan') }}">Bimbingan & KRS</a>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Offering</th>
+            <th>Mata kuliah / Kelas</th>
+            <th>Year/Term</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in my_offerings %}
+            {% set mk = mk_by_id.get(o.matakuliah_id) %}
+            <tr>
+              <td><strong>#{{ o.id }}</strong></td>
+              <td>
+                <div><strong>{{ mk.kode if mk else o.matakuliah_id }}</strong> — {{ mk.nama if mk else "" }}</div>
+                <div class="muted">Kelas: {{ o.kelas or '-' }}</div>
+              </td>
+              <td class="muted">{{ o.year }} / {{ o.term }}</td>
+              <td><a class="btn btn--small" href="{{ url_for('dosen_mk_detail', offering_id=o.id) }}">Buka</a></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="4" class="muted">Belum ada offering yang di-assign ke dosen ini.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

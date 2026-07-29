@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% set title = "Bimbingan & KRS" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Mahasiswa bimbingan</div>
+          <div class="card__subtitle">Daftar mahasiswa yang menjadi bimbingan/dosen wali.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>NIM</th>
+              <th>Semester</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bimbingan %}
+              {% set m = mahasiswa_by_id.get(b.mahasiswa_id) %}
+              <tr>
+                <td><strong>{{ m.nama if m else b.mahasiswa_id }}</strong></td>
+                <td class="muted">{{ m.nim if m else "-" }}</td>
+                <td class="muted">{{ m.semester if m else "-" }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="muted">Belum ada bimbingan.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Persetujuan KRS</div>
+          <div class="card__subtitle">
+            {% if settings.krs_open %}
+              Periode KRS aktif — bisa approve/reject/cancel.
+            {% else %}
+              Periode KRS ditutup — hanya bisa lihat.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if pending_krs %}
+        <div class="hint" style="padding: 0 16px 12px">KRS Pending:</div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mahasiswa</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k in pending_krs %}
+                {% set m = mahasiswa_by_id.get(k.mahasiswa_id) %}
+                <tr>
+                  <td>
+                    <strong>{{ m.nama if m else k.mahasiswa_id }}</strong>
+                    <div class="muted">NIM: {{ m.nim if m else "-" }}</div>
+                  </td>
+                  <td><span class="pill pill--warn">{{ k.status }}</span></td>
+                  <td>
+                    {% if settings.krs_open %}
+                      <form method="post" class="inline">
+                        <input type="hidden" name="action" value="approve" />
+                        <input type="hidden" name="krs_id" value="{{ k.id }}" />
+                        <button class="btn btn--small btn--primary" type="submit">Setujui</button>
+                      </form>
+                      <form method="post" class="inline">
+                        <input type="hidden" name="action" value="reject" />
+                        <input type="hidden" name="krs_id" value="{{ k.id }}" />
+                        <button class="btn btn--small" type="submit" onclick="return confirm('Tolak KRS ini?')">Tolak</button>
+                      </form>
+                    {% else %}
+                      <span class="muted">Periode KRS ditutup</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      {% if approved_krs %}
+        <div class="hint" style="padding: 12px 16px 12px">KRS Approved (bisa dibatalkan selama periode KRS masih aktif):</div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mahasiswa</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k in approved_krs %}
+                {% set m = mahasiswa_by_id.get(k.mahasiswa_id) %}
+                <tr>
+                  <td>
+                    <strong>{{ m.nama if m else k.mahasiswa_id }}</strong>
+                    <div class="muted">NIM: {{ m.nim if m else "-" }}</div>
+                  </td>
+                  <td><span class="pill pill--ok">{{ k.status }}</span></td>
+                  <td>
+                    {% if settings.krs_open %}
+                      <form method="post" class="inline">
+                        <input type="hidden" name="action" value="cancel" />
+                        <input type="hidden" name="krs_id" value="{{ k.id }}" />
+                        <button class="btn btn--small" type="submit" onclick="return confirm('Batalkan persetujuan KRS ini? Enrollments akan dihapus.')">Batalkan</button>
+                      </form>
+                    {% else %}
+                      <span class="muted">Periode KRS ditutup</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      {% if not pending_krs and not approved_krs %}
+        <div class="empty">Tidak ada KRS untuk periode aktif.</div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+

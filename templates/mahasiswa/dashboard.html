@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% set title = "Mahasiswa Dashboard" %}
+{% block content %}
+  <div class="grid grid--cards">
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">IPK</div>
+        <div class="kpi__value">{{ summary.ipk }}</div>
+      </div>
+      <div class="hint">Total SKS dihitung: <strong>{{ summary.total_sks }}</strong></div>
+    </div>
+
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">IPS Terakhir</div>
+        <div class="kpi__value">
+          {% if summary.ips and summary.ips|length %}
+            {{ summary.ips[-1].ips }}
+          {% else %}
+            0.00
+          {% endif %}
+        </div>
+      </div>
+      <div class="hint">Periode: {{ summary.ips[-1].year ~ " / " ~ summary.ips[-1].term if summary.ips and summary.ips|length else "-" }}</div>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__kpi">
+        <div class="kpi__label">KRS</div>
+        <div class="kpi__value">{{ "Buka" if settings.krs_open else "Tutup" }}</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn--primary" href="{{ url_for('mahasiswa_krs') }}">Kelola KRS</a>
+        <a class="btn" href="{{ url_for('mahasiswa_nilai') }}">Lihat Nilai</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Statistik IPS</div>
+          <div class="card__subtitle">Ringkas per semester berjalan.</div>
+        </div>
+      </div>
+      {% if summary.ips and summary.ips|length %}
+        <div class="bars">
+          {% for it in summary.ips %}
+            {% set pct = (it.ips / 4.0 * 100) %}
+            <div class="bar">
+              <div class="bar__label">{{ it.year }} {{ it.term }}</div>
+              <div class="bar__track">
+                <div class="bar__fill" style="width: {{ pct }}%"></div>
+              </div>
+              <div class="bar__value">{{ it.ips }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Belum ada data IPS (nilai belum diinput dosen).</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Profil akademik</div>
+          <div class="card__subtitle">Data mahasiswa.</div>
+        </div>
+      </div>
+      <div class="kv">
+        <div class="kv__row"><div class="kv__k">Nama</div><div class="kv__v"><strong>{{ mahasiswa.nama }}</strong></div></div>
+        <div class="kv__row"><div class="kv__k">NIM</div><div class="kv__v">{{ mahasiswa.nim }}</div></div>
+        <div class="kv__row"><div class="kv__k">Semester</div><div class="kv__v">{{ mahasiswa.semester }}</div></div>
+        <div class="kv__row"><div class="kv__k">Jurusan ID</div><div class="kv__v">{{ mahasiswa.jurusan_id }}</div></div>
+      </div>
+      <div class="hint">Nanti bisa kamu kembangkan jadi tampil nama jurusannya, dll.</div>
+    </div>
+  </div>
+{% endblock %}
+

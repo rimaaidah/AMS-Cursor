@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% set title = "Rekap Kehadiran" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">{{ mk.kode if mk else "MK" }} — {{ mk.nama if mk else "" }}</div>
+        <div class="card__subtitle">Offering #{{ offering.id }} • {{ offering.year }}/{{ offering.term }}</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn--small" href="{{ url_for('dosen_mk_detail', offering_id=offering.id) }}">Kembali</a>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Mahasiswa</th>
+            <th>NIM</th>
+            <th>Hadir</th>
+            <th>Persen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td><strong>{{ r.nama }}</strong></td>
+              <td class="muted">{{ r.nim }}</td>
+              <td class="muted">{{ r.hadir }}/16</td>
+              <td>
+                <div class="pill {% if r.persen >= 75 %}pill--ok{% elif r.persen >= 60 %}pill--warn{% endif %}">
+                  {{ r.persen }}%
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="4" class="muted">Belum ada mahasiswa di kelas ini.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Rekap per pertemuan</div>
+        <div class="card__subtitle">Jumlah hadir tiap pertemuan (dari total {{ total_students }} mahasiswa).</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table table--dense">
+        <thead>
+          <tr>
+            <th>Pertemuan</th>
+            <th>Hadir</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(1, 17) %}
+            <tr>
+              <td class="muted">Pertemuan {{ i }}</td>
+              <td>
+                <strong>{{ meeting_present[i-1] }}</strong>
+                <span class="muted">/ {{ total_students }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

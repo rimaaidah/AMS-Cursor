@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+{% set title = "Kelola Tugas" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Daftar Tugas</div>
+        <div class="card__subtitle">{{ mk.kode }} - {{ mk.nama }}</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn--small" href="{{ url_for('dosen_mk_detail', offering_id=offering.id) }}">Kembali</a>
+        <button class="btn btn--primary btn--small" onclick="openModal('modal-add')">Tambah Tugas</button>
+      </div>
+    </div>
+    
+    <div class="table-wrap">
+      <table class="table table--dense">
+        <thead>
+          <tr>
+            <th>Nama Tugas</th>
+            <th>Kategori</th>
+            <th>Bobot/Max</th>
+            <th>Rata-rata</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in assessments %}
+            <tr>
+              <td><strong>{{ a.name }}</strong></td>
+              <td>
+                {% if a.category == 'mandiri' %}
+                  <span class="pill pill--ok">Mandiri</span>
+                {% else %}
+                  <span class="pill pill--warn">Terstruktur</span>
+                {% endif %}
+              </td>
+              <td class="muted">Max: {{ a.max_score }}</td>
+              <td class="muted">{{ a.avg_score|round(1) if a.avg_score else '-' }}</td>
+              <td>
+                <button class="btn btn--small" onclick="openModal('modal-grade-{{ a.id }}')">Input Nilai</button>
+                <button class="btn btn--small btn--danger" onclick="openModal('modal-delete-{{ a.id }}')">Hapus</button>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="muted">Belum ada tugas dibuat.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Tugas -->
+  <div id="modal-add" class="modal-overlay">
+    <div class="modal">
+      <div class="modal__header">
+        <span>Tambah Tugas Baru</span>
+        <button class="modal__close" onclick="closeModal('modal-add')">&times;</button>
+      </div>
+      <form method="post">
+        <input type="hidden" name="action" value="create">
+        <label class="field">
+          <span class="field__label">Nama Tugas</span>
+          <input class="input" name="name" placeholder="Contoh: Kuis 1" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Kategori</span>
+          <select class="input" name="category">
+            <option value="mandiri">Tugas Mandiri</option>
+            <option value="terstruktur">Tugas Terstruktur</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Nilai Maksimal</span>
+          <input type="number" class="input" name="max_score" value="100" required>
+        </label>
+        <div style="margin-top:15px; text-align:right;">
+          <button class="btn btn--primary">Buat Tugas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modals moved outside the table to avoid layout glitches -->
+  {% for a in assessments %}
+    <!-- Modal Delete -->
+    <div id="modal-delete-{{ a.id }}" class="modal-overlay">
+      <div class="modal">
+        <div class="modal__header">
+          <span>Hapus Tugas</span>
+          <button class="modal__close" onclick="closeModal('modal-delete-{{ a.id }}')">&times;</button>
+        </div>
+        <div class="modal__body">
+          <p>Apakah Anda yakin ingin menghapus tugas "<strong>{{ a.name }}</strong>"?</p>
+          <p class="muted">Data nilai yang sudah diinput untuk tugas ini akan ikut terhapus.</p>
+        </div>
+        <div class="modal__footer" style="text-align: right; margin-top: 1rem;">
+          <button class="btn" onclick="closeModal('modal-delete-{{ a.id }}')">Batal</button>
+          <form method="post" class="inline">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="assessment_id" value="{{ a.id }}">
+            <button class="btn btn--danger">Ya, Hapus</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Input Nilai -->
+    <div id="modal-grade-{{ a.id }}" class="modal-overlay">
+      <div class="modal">
+        <div class="modal__header">
+          <span>Input Nilai: {{ a.name }}</span>
+          <button class="modal__close" onclick="closeModal('modal-grade-{{ a.id }}')">&times;</button>
+        </div>
+        <form method="post">
+          <input type="hidden" name="action" value="save_grades">
+          <input type="hidden" name="assessment_id" value="{{ a.id }}">
+          <div class="table-wrap" style="max-height:400px; overflow-y:auto;">
+            <table class="table table--dense">
+              <thead><tr><th>Mahasiswa</th><th>Nilai (0-{{ a.max_score }})</th></tr></thead>
+              <tbody>
+                {% for e in enrollments %}
+                  {% set m = mahasiswa_by_id.get(e.mahasiswa_id) %}
+                  {% set g = grades_by_assessment.get(a.id, {}).get(e.mahasiswa_id) %}
+                  <tr>
+                    <td>{{ m.nama }}<br><small class="muted">{{ m.nim }}</small></td>
+                    <td>
+                      <input type="number" name="score_{{ e.mahasiswa_id }}" 
+                             value="{{ g if g is not none else '' }}" 
+                             class="input input--small" min="0" max="{{ a.max_score }}">
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:10px; text-align:right;">
+            <button class="btn btn--primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}

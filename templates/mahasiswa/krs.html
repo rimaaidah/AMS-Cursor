@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% set title = "KRS" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Pilih mata kuliah</div>
+          <div class="card__subtitle">
+            Terfilter jurusan & term aktif. Status KRS: 
+            {% if current_krs %}
+              <span class="pill {% if current_krs.status=='approved' %}pill--ok{% else %}pill--warn{% endif %}">{{ current_krs.status }}</span>
+            {% else %}
+              <span class="pill">belum ada</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <form method="post" class="form">
+        <div class="hint">
+          {% if settings.krs_open %}
+            Periode KRS sedang <strong>dibuka</strong>. Pilih MK lalu submit.
+          {% else %}
+            Periode KRS sedang <strong>ditutup</strong>. Kamu hanya bisa melihat.
+          {% endif %}
+        </div>
+
+        <div class="table-wrap">
+          <table class="table table--dense">
+            <thead>
+              <tr>
+                <th>Pilih</th>
+                <th>MK</th>
+                <th>SKS</th>
+                <th>Dosen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set chosen = (current_krs.get('items', []) if current_krs else []) %}
+              {% for o in offerings %}
+                {% set m = mk_by_id.get(o.matakuliah_id) %}
+                {% set d = dosen_by_id.get(o.dosen_id) %}
+                <tr>
+                  <td>
+                    <input type="checkbox" name="offering_id" value="{{ o.id }}"
+                      {% if o.id in chosen %}checked{% endif %}
+                      {% if current_krs and current_krs.status=='approved' %}disabled{% endif %}
+                      {% if not settings.krs_open %}disabled{% endif %}
+                    />
+                  </td>
+                  <td>
+                    <strong>{{ m.kode if m else ("#"+o.matakuliah_id|string) }}</strong>
+                    — {{ m.nama if m else "" }}
+                    <div class="muted">Offering #{{ o.id }} • {{ o.year }}/{{ o.term }}</div>
+                  </td>
+                  <td class="muted">{{ m.sks if m else "-" }}</td>
+                  <td>{{ d.nama if d else o.dosen_id }}</td>
+                </tr>
+              {% else %}
+                <tr><td colspan="4" class="muted">Belum ada offering untuk periode aktif.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn btn--primary" type="submit"
+          {% if not settings.krs_open or (current_krs and current_krs.status=='approved') %}disabled{% endif %}
+        >
+          Submit KRS
+        </button>
+      </form>
+
+      {% if current_krs and current_krs.status != 'approved' and settings.krs_open %}
+        <form method="post" action="{{ url_for('mahasiswa_krs_cancel') }}" class="form" style="padding-top:0">
+          <button class="btn" type="submit" onclick="return confirm('Batalkan KRS untuk periode ini?')">
+            Batalkan KRS
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Info</div>
+          <div class="card__subtitle">Apa yang terjadi setelah submit.</div>
+        </div>
+      </div>
+      <ul class="list">
+        <li>KRS akan berstatus <strong>pending</strong> dan menunggu persetujuan dosen wali.</li>
+        <li>Jika <strong>approved</strong>, kamu otomatis terdaftar di kelas dosen pengampu (enrollments).</li>
+        <li>Nilai akan tampil real-time jika dosen sudah input.</li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}
+
