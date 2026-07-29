@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% set title = "Mata Kuliah" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">{% if edit %}Edit mata kuliah{% else %}Tambah mata kuliah{% endif %}</div>
+          <div class="card__subtitle">Filter KRS berdasar jurusan & term ganjil/genap.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        {% if edit %}
+          <input type="hidden" name="action" value="update" />
+          <input type="hidden" name="id" value="{{ edit.id }}" />
+        {% endif %}
+        <div class="grid grid--2">
+          <label class="field">
+            <span class="field__label">Kode</span>
+            <input class="input" name="kode" placeholder="STAT101" value="{{ edit.kode if edit else '' }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">SKS</span>
+            <input class="input" type="number" name="sks" min="1" max="6" value="{{ edit.sks if edit else 3 }}" required />
+          </label>
+        </div>
+        <label class="field">
+          <span class="field__label">Nama</span>
+          <input class="input" name="nama" placeholder="Statistical Methods" value="{{ edit.nama if edit else '' }}" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Jurusan</span>
+          <select class="input" name="jurusan_id" required>
+            <option value="">Pilih jurusan</option>
+            {% for j in jurusan %}
+              <option value="{{ j.id }}" {% if edit and edit.jurusan_id==j.id %}selected{% endif %}>{{ j.kode }} — {{ j.nama }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="grid grid--2">
+          <label class="field">
+            <span class="field__label">Semester rekomendasi</span>
+            <input class="input" type="number" name="semester_rekom" min="1" max="14" value="{{ edit.semester_rekom if edit else 3 }}" required />
+          </label>
+          <label class="field">
+            <span class="field__label">Term</span>
+            <select class="input" name="term" required>
+              <option value="ganjil" {% if edit and edit.term=='ganjil' %}selected{% endif %}>Ganjil</option>
+              <option value="genap" {% if edit and edit.term=='genap' %}selected{% endif %}>Genap</option>
+            </select>
+          </label>
+        </div>
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Simpan</button>
+          {% if edit %}
+            <a class="btn" href="{{ url_for('admin_matakuliah') }}">Batal</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar mata kuliah</div>
+          <div class="card__subtitle">{{ matakuliah|length }} data</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama</th>
+              <th>SKS</th>
+              <th>Jurusan</th>
+              <th>Sem</th>
+              <th>Term</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in matakuliah %}
+              <tr>
+                <td><strong>{{ m.kode }}</strong></td>
+                <td>{{ m.nama }}</td>
+                <td class="muted">{{ m.sks }}</td>
+                <td class="muted">{{ m.jurusan_id }}</td>
+                <td class="muted">{{ m.semester_rekom }}</td>
+                <td><span class="pill">{{ m.term }}</span></td>
+                <td>
+                  <a class="btn btn--small" href="{{ url_for('admin_matakuliah', edit=m.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('admin_matakuliah_delete', matakuliah_id=m.id) }}" class="inline">
+                    <button class="btn btn--small" type="submit" onclick="return confirm('Hapus mata kuliah ini?')">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="7" class="muted">Belum ada mata kuliah</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
