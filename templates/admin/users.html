@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% set title = "Users" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar user</div>
+          <div class="card__subtitle">Perubahan profil user akan langsung tampil di sini.</div>
+        </div>
+        <div class="actions">
+          <a class="btn btn--primary" href="{{ url_for('admin_create_dosen') }}">+ Dosen</a>
+          <a class="btn btn--primary" href="{{ url_for('admin_create_mahasiswa') }}">+ Mahasiswa</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Ref</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td><strong>{{ u.username }}</strong></td>
+                <td><span class="pill">{{ u.role }}</span></td>
+                <td class="muted">{{ u.ref.type }}#{{ u.ref.id }}</td>
+                <td class="muted">{{ u.updated_at or "-" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Akun default</div>
+          <div class="card__subtitle">Ubah segera setelah run.</div>
+        </div>
+      </div>
+      <div class="notice">
+        Admin default: <strong>admin</strong> / <strong>admin</strong>
+      </div>
+      <div class="hint">
+        Password disimpan sebagai hash (bukan plaintext).
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
