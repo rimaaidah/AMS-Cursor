@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% set title = "Rekap Nilai" %}
+{% block content %}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <div class="card__title">Rekap Nilai Seluruh Mahasiswa</div>
+        <div class="card__subtitle">Pilih mata kuliah untuk melihat/input nilai mahasiswa.</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Year/Term</th>
+            <th>MK</th>
+            <th>Dosen</th>
+            <th>Peserta</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in offering %}
+            {% set mk = (matakuliah|selectattr('id','equalto',o.matakuliah_id)|first) %}
+            {% set ds = (dosen|selectattr('id','equalto',o.dosen_id)|first) %}
+            {% set count = (enrollments|selectattr('offering_id','equalto',o.id)|list|length) %}
+            <tr>
+              <td>{{ o.year }} / {{ o.term|capitalize }}</td>
+              <td>
+                <strong>{{ mk.nama }}</strong>
+                <div class="muted">{{ mk.kode }} • Kelas {{ o.kelas or '-' }}</div>
+              </td>
+              <td>{{ ds.nama }}</td>
+              <td>{{ count }} Mahasiswa</td>
+              <td>
+                <a class="btn btn--small btn--primary" href="{{ url_for('dosen_mk_detail', offering_id=o.id) }}">
+                  Kelola Nilai
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center muted">Belum ada offering.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
