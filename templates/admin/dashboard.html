@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% set title = "Admin Dashboard" %}
+{% block content %}
+  <div class="grid grid--cards">
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">Users</div>
+        <div class="kpi__value">{{ stats.users }}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">Dosen</div>
+        <div class="kpi__value">{{ stats.dosen }}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">Mahasiswa</div>
+        <div class="kpi__value">{{ stats.mahasiswa }}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">Mata Kuliah</div>
+        <div class="kpi__value">{{ stats.matakuliah }}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__kpi">
+        <div class="kpi__label">Offering</div>
+        <div class="kpi__value">{{ stats.offering }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Quick actions</div>
+          <div class="card__subtitle">Buat akun & kelola data akademik.</div>
+        </div>
+      </div>
+      <div class="actions" style="padding:0 16px 12px">
+        <form method="post" action="{{ url_for('admin_toggle_krs') }}" class="inline">
+          <button class="btn {% if settings.krs_open %}btn--primary{% endif %}" type="submit">
+            {% if settings.krs_open %}Tutup KRS{% else %}Buka KRS{% endif %}
+          </button>
+        </form>
+        <form method="post" action="{{ url_for('admin_toggle_kuliah') }}" class="inline">
+          <button class="btn {% if settings.kuliah_open %}btn--primary{% endif %}" type="submit">
+            {% if settings.kuliah_open %}Tutup Kuliah{% else %}Buka Kuliah{% endif %}
+          </button>
+        </form>
+        <form method="post" action="{{ url_for('admin_toggle_nilai') }}" class="inline">
+          <button class="btn {% if settings.nilai_open %}btn--primary{% endif %}" type="submit">
+            {% if settings.nilai_open %}Tutup Input Nilai{% else %}Buka Input Nilai{% endif %}
+          </button>
+        </form>
+      </div>
+      <div class="actions">
+        <a class="btn btn--primary" href="{{ url_for('admin_create_dosen') }}">+ Buat Dosen</a>
+        <a class="btn btn--primary" href="{{ url_for('admin_create_mahasiswa') }}">+ Buat Mahasiswa</a>
+        <a class="btn" href="{{ url_for('admin_dosen') }}">Kelola Dosen</a>
+        <a class="btn" href="{{ url_for('admin_mahasiswa') }}">Kelola Mahasiswa</a>
+        <a class="btn" href="{{ url_for('admin_matakuliah') }}">Kelola Mata Kuliah</a>
+        <a class="btn" href="{{ url_for('admin_offering') }}">Kelola Offering</a>
+        <a class="btn" href="{{ url_for('admin_bimbingan') }}">Kelola Bimbingan</a>
+        <a class="btn" href="{{ url_for('admin_settings') }}">KRS & Periode</a>
+      </div>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Status akademik</div>
+          <div class="card__subtitle">Ringkasan periode & operasional.</div>
+        </div>
+      </div>
+      <div class="kv">
+        <div class="kv__row"><div class="kv__k">Tahun ajaran</div><div class="kv__v"><strong>{{ settings.active_year }}</strong></div></div>
+        <div class="kv__row"><div class="kv__k">Term</div><div class="kv__v"><strong>{{ settings.active_term }}</strong></div></div>
+        <div class="kv__row"><div class="kv__k">Periode KRS</div><div class="kv__v"><strong>{{ "Buka" if settings.krs_open else "Tutup" }}</strong></div></div>
+        <div class="kv__row"><div class="kv__k">Periode Kuliah</div><div class="kv__v"><strong>{{ "Buka" if settings.kuliah_open else "Tutup" }}</strong></div></div>
+        <div class="kv__row"><div class="kv__k">Periode Input Nilai</div><div class="kv__v"><strong>{{ "Buka" if settings.nilai_open else "Tutup" }}</strong></div></div>
+      </div>
+      <div class="hint">Admin dapat menyesuaikan periode di menu <strong>Settings</strong> atau gunakan tombol toggle di atas.</div>
+    </div>
+  </div>
+{% endblock %}
+
