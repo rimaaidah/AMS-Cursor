@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% set title = "Offering" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Buat offering</div>
+          <div class="card__subtitle">Menentukan MK diampu oleh dosen siapa, pada year/term.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <label class="field">
+          <span class="field__label">Mata kuliah</span>
+          <select class="input" name="matakuliah_id" required>
+            <option value="">Pilih MK</option>
+            {% for m in matakuliah %}
+              <option value="{{ m.id }}">{{ m.kode }} — {{ m.nama }} ({{ m.term }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Kelas (opsional)</span>
+          <input class="input" name="kelas" placeholder="Mis. A / B / Reguler Pagi" />
+        </label>
+        <label class="field">
+          <span class="field__label">Dosen pengampu</span>
+          <select class="input" name="dosen_id" required>
+            <option value="">Pilih dosen</option>
+            {% for d in dosen %}
+              <option value="{{ d.id }}">{{ d.nama }} ({{ d.nidn }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <div class="grid grid--2">
+          <label class="field">
+            <span class="field__label">Tahun ajaran</span>
+            <input class="input" name="year" value="{{ settings.active_year }}" />
+          </label>
+          <label class="field">
+            <span class="field__label">Term</span>
+            <select class="input" name="term">
+              <option value="ganjil" {% if settings.active_term=="ganjil" %}selected{% endif %}>Ganjil</option>
+              <option value="genap" {% if settings.active_term=="genap" %}selected{% endif %}>Genap</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn btn--primary" type="submit">Simpan</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar offering</div>
+          <div class="card__subtitle">{{ offering|length }} data</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Year/Term</th>
+              <th>MK</th>
+              <th>Dosen</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in offering %}
+              {% set mk = (matakuliah|selectattr('id','equalto',o.matakuliah_id)|first) %}
+              {% set ds = (dosen|selectattr('id','equalto',o.dosen_id)|first) %}
+              <tr>
+                <td class="muted">{{ o.year }} / {{ o.term }}</td>
+                <td><strong>{{ mk.kode if mk else o.matakuliah_id }}</strong> — {{ mk.nama if mk else "" }}</td>
+                <td>
+                  <div><strong>{{ ds.nama if ds else o.dosen_id }}</strong></div>
+                  <form method="post" action="{{ url_for('admin_offering_update_dosen', offering_id=o.id) }}" class="inline">
+                    <select class="input input--small" name="dosen_id" style="max-width:240px">
+                      {% for d in dosen %}
+                        <option value="{{ d.id }}" {% if d.id==o.dosen_id %}selected{% endif %}>{{ d.nama }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn--small" type="submit">Update</button>
+                  </form>
+                </td>
+                <td>
+                  <a class="btn btn--small" href="{{ url_for('admin_offering_detail', offering_id=o.id) }}">Detail</a>
+                  <form method="post" action="{{ url_for('admin_offering_delete', offering_id=o.id) }}" class="inline">
+                    <button class="btn btn--small" type="submit" onclick="return confirm('Hapus offering ini?')">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="muted">Belum ada offering</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
