@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% set title = "Settings" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Periode akademik</div>
+          <div class="card__subtitle">Mengatur year/term aktif dan 3 periode sistem.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <label class="field">
+          <span class="field__label">Tahun ajaran aktif</span>
+          <input class="input" name="active_year" value="{{ settings.active_year }}" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Term aktif</span>
+          <select class="input" name="active_term" required>
+            <option value="ganjil" {% if settings.active_term=="ganjil" %}selected{% endif %}>Ganjil</option>
+            <option value="genap" {% if settings.active_term=="genap" %}selected{% endif %}>Genap</option>
+          </select>
+        </label>
+        <div class="divider"></div>
+        <label class="field field--row">
+          <input type="checkbox" name="krs_open" {% if settings.krs_open %}checked{% endif %} />
+          <span class="field__label"><strong>Periode KRS</strong> — Mahasiswa pilih MK, dosen approve/reject/cancel</span>
+        </label>
+        <label class="field field--row">
+          <input type="checkbox" name="kuliah_open" {% if settings.kuliah_open %}checked{% endif %} />
+          <span class="field__label"><strong>Periode Kuliah</strong> — Dosen input presensi & nilai tugas, mahasiswa lihat</span>
+        </label>
+        <label class="field field--row">
+          <input type="checkbox" name="nilai_open" {% if settings.nilai_open %}checked{% endif %} />
+          <span class="field__label"><strong>Periode Input Nilai</strong> — Dosen input UTS/UAS, otomatis jadi nilai akhir</span>
+        </label>
+        <button class="btn btn--primary" type="submit">Simpan</button>
+      </form>
+    </div>
+
+    <div class="card card--soft">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Catatan</div>
+          <div class="card__subtitle">Dampak ke fitur lain.</div>
+        </div>
+      </div>
+      <ul class="list">
+        <li><strong>Periode KRS:</strong> Mahasiswa pilih MK, dosen bisa approve/reject/cancel (selama periode masih buka).</li>
+        <li><strong>Periode Kuliah:</strong> Dosen input presensi 16 pertemuan & nilai tugas mandiri/terstruktur. Mahasiswa hanya lihat.</li>
+        <li><strong>Periode Input Nilai:</strong> Dosen input UTS/UAS + komposisi, nilai akhir otomatis dihitung. Mahasiswa lihat detail lengkap + rekapan kehadiran.</li>
+        <li>Menu KRS mahasiswa hanya menampilkan offering yang match dengan <strong>jurusan, semester, dan term aktif</strong>.</li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}
+
