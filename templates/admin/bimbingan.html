@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% set title = "Bimbingan" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Assign bimbingan</div>
+          <div class="card__subtitle">Menentukan mahasiswa bimbingan untuk tiap dosen wali.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        <label class="field">
+          <span class="field__label">Dosen</span>
+          <select class="input" name="dosen_id" required>
+            <option value="">Pilih dosen</option>
+            {% for d in dosen %}
+              <option value="{{ d.id }}">{{ d.nama }} ({{ d.nidn }})</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Mahasiswa</span>
+          <select class="input" name="mahasiswa_id" required>
+            <option value="">Pilih mahasiswa</option>
+            {% for m in mahasiswa %}
+              <option value="{{ m.id }}">{{ m.nama }} — {{ m.nim }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="btn btn--primary" type="submit">Simpan</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar bimbingan</div>
+          <div class="card__subtitle">{{ bimbingan|length }} relasi</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Dosen</th>
+              <th>Mahasiswa</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bimbingan %}
+              {% set d = dosen_by_id.get(b.dosen_id) %}
+              {% set m = mahasiswa_by_id.get(b.mahasiswa_id) %}
+              <tr>
+                <td><strong>{{ d.nama if d else b.dosen_id }}</strong></td>
+                <td>
+                  <strong>{{ m.nama if m else b.mahasiswa_id }}</strong>
+                  <div class="muted">{{ m.nim if m else "" }}</div>
+                </td>
+                <td>
+                  <form method="post" action="{{ url_for('admin_bimbingan_delete', bimbingan_id=b.id) }}" class="inline">
+                    <button class="btn btn--small" type="submit" onclick="return confirm('Hapus relasi bimbingan ini?')">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="muted">Belum ada bimbingan.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
