@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% set title = "Jurusan" %}
+{% block content %}
+  <div class="grid grid--2">
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">{% if edit %}Edit jurusan{% else %}Tambah jurusan{% endif %}</div>
+          <div class="card__subtitle">Dipakai untuk filter MK & KRS.</div>
+        </div>
+      </div>
+      <form method="post" class="form">
+        {% if edit %}
+          <input type="hidden" name="action" value="update" />
+          <input type="hidden" name="id" value="{{ edit.id }}" />
+        {% endif %}
+        <label class="field">
+          <span class="field__label">Kode</span>
+          <input class="input" name="kode" placeholder="BCA" value="{{ edit.kode if edit else '' }}" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Nama</span>
+          <input class="input" name="nama" placeholder="Bachelor of Computer Applications" value="{{ edit.nama if edit else '' }}" required />
+        </label>
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Simpan</button>
+          {% if edit %}
+            <a class="btn" href="{{ url_for('admin_jurusan') }}">Batal</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <div class="card__title">Daftar jurusan</div>
+          <div class="card__subtitle">{{ jurusan|length }} data</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Kode</th>
+              <th>Nama</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for j in jurusan %}
+              <tr>
+                <td>{{ j.id }}</td>
+                <td><strong>{{ j.kode }}</strong></td>
+                <td>{{ j.nama }}</td>
+                <td>
+                  <a class="btn btn--small" href="{{ url_for('admin_jurusan', edit=j.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('admin_jurusan_delete', jurusan_id=j.id) }}" class="inline">
+                    <button class="btn btn--small" type="submit" onclick="return confirm('Hapus jurusan ini?')">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="muted">Belum ada jurusan</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
